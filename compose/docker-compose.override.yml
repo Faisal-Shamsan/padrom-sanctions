@@ -1,0 +1,31 @@
+# Dev overrides — layered on top of docker-compose.yml.
+# Bind mounts replace built artefacts with live source so changes reflect
+# immediately without rebuilding the image.
+#
+# Usage (from repo root):
+#   docker compose -f compose/docker-compose.yml \
+#                  -f compose/docker-compose.override.yml up
+
+services:
+  api:
+    # Use the builder stage which has dev deps (pytest, ruff, mypy)
+    build:
+      target: builder
+    volumes:
+      # Sync source code changes into the container in real time
+      - ../api/src:/app/src:ro
+    # --reload watches for file changes and restarts the server automatically
+    command: /app/.venv/bin/uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      DEBUG: "true"
+
+  ui:
+    # Override the build entirely — run the dev server directly from source
+    build:
+      target: deps   # only need node_modules, not the full build
+    volumes:
+      - ../ui:/app
+      # Anonymous volume prevents the host node_modules from shadowing the
+      # container's node_modules (different OS / arch may differ)
+      - /app/node_modules
+    command: pnpm dev

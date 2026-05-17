@@ -1,0 +1,54 @@
+# Base compose file — production-style images, no bind mounts.
+# For local dev with hot reload, layer compose/docker-compose.override.yml on top.
+#
+# Usage (from repo root):
+#   docker compose -f compose/docker-compose.yml up
+#
+# Note: "version" key is intentionally omitted — it is obsolete in Compose v2+.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: padrom
+      POSTGRES_PASSWORD: padrom
+      POSTGRES_DB: padrom
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U padrom"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ../api
+      dockerfile: docker/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://padrom:padrom@db:5432/padrom
+      # JSON string — must be valid JSON (quotes escaped for shell safety)
+      CORS_ORIGINS: '["http://localhost:3000"]'
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  ui:
+    build:
+      context: ../ui
+      dockerfile: Dockerfile
+    environment:
+      # This value is baked into the Next.js bundle at build time.
+      # For Docker, the browser talks to the host machine, not the container name.
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

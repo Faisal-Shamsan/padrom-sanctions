@@ -1,0 +1,19 @@
+.git/
+.github/
+docs/
+*.md
+.gitignore
+.dockerignore
+
+# API artefacts (ignored when building UI image, and vice versa)
+api/.venv/
+api/__pycache__/
+api/.mypy_cache/
+api/.ruff_cache/
+api/.pytest_cache/
+api/.env
+
+# UI artefacts
+ui/node_modules/
+ui/.next/
+ui/.env.local

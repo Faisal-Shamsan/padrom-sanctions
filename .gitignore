@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+*.egg-info/
+dist/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Environment files — NEVER commit these
+.env
+.env.local
+.env.*.local
+
+# uv
+# uv.lock IS committed (lock file ensures reproducible installs)
+
+# Node
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+.pnpm-debug.log*
+pnpm-lock.yaml.bak
+
+# Docker
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# OS
+.DS_Store
