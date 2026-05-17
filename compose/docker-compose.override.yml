@@ -28,4 +28,5 @@ services:
       # Anonymous volume prevents the host node_modules from shadowing the
       # container's node_modules (different OS / arch may differ)
       - /app/node_modules
+      - /app/.next
     command: pnpm dev
