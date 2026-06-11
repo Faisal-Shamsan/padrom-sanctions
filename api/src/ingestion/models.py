@@ -3,11 +3,9 @@ from datetime import datetime
 
 from sqlalchemy import DateTime, Index, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 
-
-class Base(DeclarativeBase):
-    pass
+from src.base import Base
 
 
 class SanctionEntry(Base):

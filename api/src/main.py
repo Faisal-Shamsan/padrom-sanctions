@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.config import settings
 from src.ingestion import router as ingestion_router
+from src.screening import router as screening_router
 
 app = FastAPI(
     title="PADROM Sanctions Screening API",
@@ -19,8 +20,7 @@ app.add_middleware(
 )
 
 app.include_router(ingestion_router, prefix="/v1/ingest")
-# Future routers will be included here, e.g.:
-# app.include_router(screening.router, prefix="/v1/screen")
+app.include_router(screening_router, prefix="/v1/screen")
 
 
 @app.get("/health", tags=["ops"])

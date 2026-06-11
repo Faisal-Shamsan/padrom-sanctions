@@ -12,8 +12,10 @@ from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+from src.base import Base
 from src.config import settings
-from src.ingestion.models import Base
+import src.ingestion.models  # noqa: F401 — registers SanctionEntry in metadata
+import src.screening.models  # noqa: F401 — registers ScreeningLog in metadata
 
 config = context.config
 
