@@ -11,6 +11,7 @@ from collections.abc import AsyncGenerator
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy.dialects.postgresql import ENUM as PgENUM
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import NullPool
 from testcontainers.postgres import PostgresContainer
@@ -34,6 +35,11 @@ async def db_engine(postgres: PostgresContainer):  # type: ignore[no-untyped-def
     )
     engine = create_async_engine(url, echo=False, poolclass=NullPool)
     async with engine.begin() as conn:
+        await conn.run_sync(
+            lambda c: PgENUM(
+                "POTENTIAL_MATCH", "NO_MATCH", name="matchresult"
+            ).create(c, checkfirst=True)
+        )
         await conn.run_sync(Base.metadata.create_all)
     yield engine
     await engine.dispose()

@@ -15,6 +15,7 @@ import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
+from sqlalchemy.dialects.postgresql import ENUM as PgENUM
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import NullPool
 from testcontainers.postgres import PostgresContainer
@@ -41,6 +42,11 @@ async def db_engine(postgres: PostgresContainer):  # type: ignore[no-untyped-def
     async with engine.begin() as conn:
         # Enable pg_trgm before create_all so the GIN trigram index succeeds
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+        await conn.run_sync(
+            lambda c: PgENUM(
+                "POTENTIAL_MATCH", "NO_MATCH", name="matchresult"
+            ).create(c, checkfirst=True)
+        )
         await conn.run_sync(Base.metadata.create_all)
     yield engine
     await engine.dispose()
