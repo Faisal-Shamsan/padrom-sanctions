@@ -31,12 +31,6 @@ def upgrade() -> None:
         postgresql_ops={"primary_name": "gin_trgm_ops"},
     )
 
-    # matchresult enum type
-    matchresult = postgresql.ENUM(
-        "POTENTIAL_MATCH", "NO_MATCH", name="matchresult", create_type=True
-    )
-    matchresult.create(op.get_bind(), checkfirst=True)
-
     # screening_log table
     op.create_table(
         "screening_log",
@@ -50,7 +44,7 @@ def upgrade() -> None:
         sa.Column("queried_name", sa.Text(), nullable=False),
         sa.Column(
             "result",
-            sa.Enum("POTENTIAL_MATCH", "NO_MATCH", name="matchresult"),
+            postgresql.ENUM("POTENTIAL_MATCH", "NO_MATCH", name="matchresult", create_type=True),
             nullable=False,
         ),
         sa.Column("score", sa.Float(), nullable=False),

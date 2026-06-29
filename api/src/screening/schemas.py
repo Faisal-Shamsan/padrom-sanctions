@@ -24,3 +24,20 @@ class ScreeningResponse(BaseModel):
     matched_entry: MatchedEntry | None
     screened_at: datetime
     duration_ms: int
+
+
+class HistoryItem(BaseModel):
+    screening_id: uuid.UUID
+    external_id: str
+    queried_name: str
+    result: str
+    score: float
+    screened_at: datetime
+    duration_ms: int
+
+
+class HistoryResponse(BaseModel):
+    items: list[HistoryItem]
+    total: int
+    page: int
+    page_size: int

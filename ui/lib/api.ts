@@ -1,9 +1,14 @@
-import type { ScreenEntityRequest, ScreenEntityResponse } from "./types";
+import type {
+  HistoryResponse,
+  ScreenEntityRequest,
+  ScreenEntityResponse,
+  StatusResponse,
+  SyncResponse,
+} from "./types";
 
 // Base URL is set at build time via NEXT_PUBLIC_API_URL.
 // The fallback is only used in local dev without a .env.local.
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 // ---------------------------------------------------------------------------
 // Internal helper — centralises error handling and JSON parsing
@@ -38,10 +43,7 @@ export async function getHealth(): Promise<{ status: string }> {
   return request<{ status: string }>("/health");
 }
 
-/**
- * POST /v1/screen/entity — submit a counterparty for sanctions screening.
- * Endpoint not yet implemented; will return 404 until Sprint 2.
- */
+/** POST /v1/screen/entity — submit a counterparty for sanctions screening. */
 export async function screenEntity(
   payload: ScreenEntityRequest,
 ): Promise<ScreenEntityResponse> {
@@ -49,4 +51,24 @@ export async function screenEntity(
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+/** GET /v1/screen/history — paginated audit log of screening results. */
+export async function getHistory(
+  page: number,
+  pageSize: number,
+): Promise<HistoryResponse> {
+  return request<HistoryResponse>(
+    `/v1/screen/history?page=${page}&page_size=${pageSize}`,
+  );
+}
+
+/** POST /v1/ingest/sync — trigger a full re-sync of sanctions lists. */
+export async function triggerSync(): Promise<SyncResponse> {
+  return request<SyncResponse>("/v1/ingest/sync", { method: "POST" });
+}
+
+/** GET /v1/ingest/status — current entry counts and last sync times. */
+export async function getIngestStatus(): Promise<StatusResponse> {
+  return request<StatusResponse>("/v1/ingest/status");
 }

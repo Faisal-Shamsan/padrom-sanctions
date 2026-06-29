@@ -5,13 +5,19 @@ and returns a ScreeningResponse.
 
 import time
 
-from sqlalchemy import select, text
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.ingestion.models import SanctionEntry
 from src.screening import matcher
 from src.screening.models import MatchResult, ScreeningLog
-from src.screening.schemas import MatchedEntry, ScreeningRequest, ScreeningResponse
+from src.screening.schemas import (
+    HistoryItem,
+    HistoryResponse,
+    MatchedEntry,
+    ScreeningRequest,
+    ScreeningResponse,
+)
 
 
 async def screen(session: AsyncSession, body: ScreeningRequest) -> ScreeningResponse:
@@ -66,3 +72,35 @@ async def screen(session: AsyncSession, body: ScreeningRequest) -> ScreeningResp
         screened_at=log.screened_at,
         duration_ms=duration_ms,
     )
+
+
+async def get_history(
+    session: AsyncSession, page: int, page_size: int
+) -> HistoryResponse:
+    offset = (page - 1) * page_size
+
+    total_result = await session.execute(select(func.count()).select_from(ScreeningLog))
+    total = total_result.scalar_one()
+
+    rows_result = await session.execute(
+        select(ScreeningLog)
+        .order_by(ScreeningLog.screened_at.desc())
+        .offset(offset)
+        .limit(page_size)
+    )
+    rows = rows_result.scalars().all()
+
+    items = [
+        HistoryItem(
+            screening_id=row.id,
+            external_id=row.external_id,
+            queried_name=row.queried_name,
+            result=row.result,
+            score=row.score,
+            screened_at=row.screened_at,
+            duration_ms=row.duration_ms,
+        )
+        for row in rows
+    ]
+
+    return HistoryResponse(items=items, total=total, page=page, page_size=page_size)

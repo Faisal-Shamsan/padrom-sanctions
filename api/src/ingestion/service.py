@@ -17,7 +17,7 @@ from src.ingestion.schemas import (
 
 EU_URL = (
     "https://webgate.ec.europa.eu/fsd/fsf/public/files/xmlFullSanctionsList_1_1/"
-    "content?token=dG9rZW4tMjAxNy0wMS0wMQ=="
+    "content?token=dG9rZW4tMjAxNw"
 )
 UN_URL = "https://scsanctions.un.org/resources/xml/en/consolidated.xml"
 
@@ -160,7 +160,7 @@ def _parse_un_xml(xml_text: str) -> list[_ParsedEntry]:
 
 
 async def _download(url: str) -> str:
-    async with httpx.AsyncClient(timeout=60.0) as client:
+    async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
         response = await client.get(url)
         response.raise_for_status()
         return response.text

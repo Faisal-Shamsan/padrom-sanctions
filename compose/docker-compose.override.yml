@@ -14,6 +14,8 @@ services:
     volumes:
       # Sync source code changes into the container in real time
       - ../api/src:/app/src:ro
+      - ../api/alembic:/app/alembic:ro
+      - ../api/alembic.ini:/app/alembic.ini:ro
     # --reload watches for file changes and restarts the server automatically
     command: /app/.venv/bin/uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
     environment:

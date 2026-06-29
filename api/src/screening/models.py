@@ -3,6 +3,7 @@ from datetime import datetime
 from enum import StrEnum
 
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, Text, func
+from sqlalchemy.dialects.postgresql import ENUM as PgENUM
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -24,7 +25,10 @@ class ScreeningLog(Base):
     )
     external_id: Mapped[str] = mapped_column(Text, nullable=False)
     queried_name: Mapped[str] = mapped_column(Text, nullable=False)
-    result: Mapped[MatchResult] = mapped_column(nullable=False)
+    result: Mapped[MatchResult] = mapped_column(
+        PgENUM("POTENTIAL_MATCH", "NO_MATCH", name="matchresult", create_type=False),
+        nullable=False,
+    )
     score: Mapped[float] = mapped_column(Float, nullable=False)
     matched_entry_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),

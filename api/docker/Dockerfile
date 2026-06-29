@@ -31,6 +31,10 @@ COPY --from=builder /app/.venv /app/.venv
 # Copy application source
 COPY src/ ./src/
 
+# Copy Alembic config and migration scripts
+COPY alembic.ini ./
+COPY alembic/ ./alembic/
+
 # Prepend venv bin so uvicorn / python resolve from the venv
 ENV PATH="/app/.venv/bin:$PATH"
 
