@@ -43,9 +43,9 @@ async def db_engine(postgres: PostgresContainer):  # type: ignore[no-untyped-def
         # Enable pg_trgm before create_all so the GIN trigram index succeeds
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
         await conn.run_sync(
-            lambda c: PgENUM(
-                "POTENTIAL_MATCH", "NO_MATCH", name="matchresult"
-            ).create(c, checkfirst=True)
+            lambda c: PgENUM("POTENTIAL_MATCH", "NO_MATCH", name="matchresult").create(
+                c, checkfirst=True
+            )
         )
         await conn.run_sync(Base.metadata.create_all)
     yield engine

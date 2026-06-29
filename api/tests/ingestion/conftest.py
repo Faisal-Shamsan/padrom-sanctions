@@ -36,9 +36,9 @@ async def db_engine(postgres: PostgresContainer):  # type: ignore[no-untyped-def
     engine = create_async_engine(url, echo=False, poolclass=NullPool)
     async with engine.begin() as conn:
         await conn.run_sync(
-            lambda c: PgENUM(
-                "POTENTIAL_MATCH", "NO_MATCH", name="matchresult"
-            ).create(c, checkfirst=True)
+            lambda c: PgENUM("POTENTIAL_MATCH", "NO_MATCH", name="matchresult").create(
+                c, checkfirst=True
+            )
         )
         await conn.run_sync(Base.metadata.create_all)
     yield engine
