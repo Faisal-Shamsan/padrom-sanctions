@@ -32,7 +32,7 @@ class ScreeningLog(Base):
     score: Mapped[float] = mapped_column(Float, nullable=False)
     matched_entry_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("sanction_entry.id"),
+        ForeignKey("sanction_entry.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
